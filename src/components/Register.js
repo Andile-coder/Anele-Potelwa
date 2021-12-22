@@ -10,16 +10,19 @@ function Signup() {
     last_Name: "",
     school_Name: "",
     grade: "",
+    center: "",
   });
   const history = useHistory();
   const handleReg = async (e) => {
     e.preventDefault();
     const docRef = doc(db, "students", "EKO8ERaOvqRsXinUGWUP");
     const payload = {
+      stu_id: auth.currentUser.uid,
       first_Name: user.first_Name,
       last_Name: user.last_Name,
       school_Name: user.school_Name,
       grade: user.grade,
+      center: user.center,
     };
     await updateDoc(docRef, {
       students: arrayUnion(payload),
@@ -72,6 +75,18 @@ function Signup() {
               required
               onChange={(e) => setUser({ ...user, email: e.target.value })}
             />
+            <label for="centers">Choose a center</label>
+            <select
+              name="centers"
+              onChange={(e) => setUser({ ...user, center: e.target.value })}
+              value={user.center}
+              required
+            >
+              <option value="Bisho">Bisho</option>
+              <option value="Kokstad">Kokstad</option>
+              <option value="Bisho">Bisho</option>
+              <option value="Bisho">Bisho</option>
+            </select>
             <input
               type="number"
               id="grade"

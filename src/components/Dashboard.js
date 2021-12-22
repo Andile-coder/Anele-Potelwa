@@ -10,18 +10,49 @@ import {
   documentId,
   doc,
   getDoc,
+  getDocs,
 } from "firebase/firestore";
 function Dashboard() {
   const [courses, setCourses] = useState([]);
   const getComments = async () => {
     const docRef = doc(db, "centers", "Ywr3vZiwpJ6H27kiIa0o");
-    onSnapshot(docRef, (snapshot) => {
+    const stuRef = doc(db, "students", "EKO8ERaOvqRsXinUGWUP");
+    onSnapshot(stuRef, (snapshot) => {
       if (snapshot.data() !== undefined) {
-        snapshot.data().centres.map((center, i) => {
-          setCourses((oldarr) => [...oldarr, center.center1.centreNam]);
-          setCourses((oldarr) => [...oldarr, center.center2.centreNam]);
-          setCourses((oldarr) => [...oldarr, center.center3.centreNam]);
-          setCourses((oldarr) => [...oldarr, center.center4.centreNam]);
+        snapshot.data().students.forEach((stu) => {
+          if (stu.stu_id == auth.currentUser.uid) {
+            console.log("stu", stu);
+          }
+        });
+      }
+    });
+    onSnapshot(docRef, (snapshot) => {
+      if (snapshot.data() !== undefined && courses.length == 0) {
+        snapshot.data().centres.forEach((center, i) => {
+          //
+          onSnapshot(stuRef, (snapshot2) => {
+            if (snapshot2.data() !== undefined) {
+              snapshot2.data().students.forEach((stu) => {
+                if (
+                  stu.center === "Bisho" &&
+                  stu.stu_id === auth.currentUser.uid
+                ) {
+                  setCourses((oldarr) => [
+                    ...oldarr,
+                    center.center1.centreName,
+                  ]);
+                } else if (
+                  stu.center === "Kokstad" &&
+                  stu.stu_id === auth.currentUser.uid
+                ) {
+                  setCourses((oldarr) => [
+                    ...oldarr,
+                    center.center2.centreName,
+                  ]);
+                }
+              });
+            }
+          });
         });
       }
       console.log("courses", courses);
@@ -36,68 +67,72 @@ function Dashboard() {
         <div id="formContent">
           <h2 className="">Available courses </h2>
           <div class="fadeIn first"></div>
-          <form>
-            <div>
-              <div style={{ position: "relative" }}>
-                {}
-                <input
-                  type="text"
-                  id="grade"
-                  className="fadeIn second"
-                  value="mathematics"
-                  name="login"
-                />
-                <button
-                  style={{
-                    position: "absolute",
-                    top: "20px",
-                    right: "0",
-                    marginRight: "50px",
-                  }}
-                >
-                  Register
-                </button>
-              </div>
-              <div style={{ position: "relative" }}>
-                <input
-                  type="text"
-                  id="grade"
-                  className="fadeIn second"
-                  value="physical science"
-                  name="login"
-                />
-                <button
-                  style={{
-                    position: "absolute",
-                    top: "20px",
-                    right: "0",
-                    marginRight: "50px",
-                  }}
-                >
-                  Register
-                </button>
-              </div>
-              <div style={{ position: "relative" }}>
-                <input
-                  type="text"
-                  id="grade"
-                  className="fadeIn third"
-                  value="Accounting"
-                  name="login"
-                />
-                <button
-                  style={{
-                    position: "absolute",
-                    top: "20px",
 
-                    right: "0",
-                    marginRight: "50px",
-                  }}
-                >
-                  Register
-                </button>
+          <form>
+            {courses.map((elem) => (
+              <div>
+                <h2>{elem}</h2>
+                <div style={{ position: "relative" }}>
+                  {}
+                  <input
+                    type="text"
+                    id="grade"
+                    className="fadeIn second"
+                    value="mathematics"
+                    name="login"
+                  />
+                  <button
+                    style={{
+                      position: "absolute",
+                      top: "20px",
+                      right: "0",
+                      marginRight: "50px",
+                    }}
+                  >
+                    Register
+                  </button>
+                </div>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    id="grade"
+                    className="fadeIn second"
+                    value="physical science"
+                    name="login"
+                  />
+                  <button
+                    style={{
+                      position: "absolute",
+                      top: "20px",
+                      right: "0",
+                      marginRight: "50px",
+                    }}
+                  >
+                    Register
+                  </button>
+                </div>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    id="grade"
+                    className="fadeIn third"
+                    value="Accounting"
+                    name="login"
+                  />
+                  <button
+                    style={{
+                      position: "absolute",
+                      top: "20px",
+
+                      right: "0",
+                      marginRight: "50px",
+                    }}
+                  >
+                    Register
+                  </button>
+                </div>
               </div>
-            </div>
+            ))}
 
             <input type="submit" class="fadeIn fourth" value="Submit" />
           </form>

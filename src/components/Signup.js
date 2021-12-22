@@ -27,7 +27,7 @@ function Signup() {
     }
   };
   const handleLogin = () => {
-    history.push("/login");
+    history.push("/");
   };
   return (
     <div>

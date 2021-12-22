@@ -1,18 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
+import { auth } from "../firebase";
 import { Route, Redirect } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-export default function PrivateRoute({ component: Component, ...rest }) {
-  const { currentUser } = useAuth();
+
+function PrivateRoute({ component: Component, ...rest }) {
+  const [userAuth, setuserAuth] = useState(false);
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      setuserAuth(true);
+    } else {
+      setuserAuth(false);
+    }
+  });
   return (
     <Route
       {...rest}
       render={(props) => {
-        return currentUser ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/login" />
-        );
+        if (userAuth) {
+          return <Component {...props} />;
+        } else if (userAuth === false) {
+          <Redirect to={{ pathname: "/", state: { from: props.location } }} />;
+        }
       }}
     ></Route>
   );
 }
+
+export default PrivateRoute;

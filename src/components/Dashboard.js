@@ -1,73 +1,104 @@
 import React, { useState, useEffect } from "react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { auth, db } from "../firebase";
 import "../styles/dist/dashboard.css";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  documentId,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 function Dashboard() {
+  const [courses, setCourses] = useState([]);
+  const getComments = async () => {
+    const docRef = doc(db, "centers", "Ywr3vZiwpJ6H27kiIa0o");
+    onSnapshot(docRef, (snapshot) => {
+      if (snapshot.data() !== undefined) {
+        snapshot.data().centres.map((center, i) => {
+          setCourses((oldarr) => [...oldarr, center.center1.centreNam]);
+          setCourses((oldarr) => [...oldarr, center.center2.centreNam]);
+          setCourses((oldarr) => [...oldarr, center.center3.centreNam]);
+          setCourses((oldarr) => [...oldarr, center.center4.centreNam]);
+        });
+      }
+      console.log("courses", courses);
+    });
+  };
+  useEffect(() => {
+    getComments();
+  });
   return (
     <div>
       <div class="wrapper fadeInDown">
         <div id="formContent">
           <h2 className="">Available courses </h2>
-
           <div class="fadeIn first"></div>
           <form>
-            <div style={{ position: "relative" }}>
-              <input
-                type="text"
-                id="grade"
-                className="fadeIn second"
-                value="mathematics"
-                name="login"
-              />
-              <button
-                style={{
-                  position: "absolute",
-                  top: "20px",
-                  right: "0",
-                  marginRight: "50px",
-                }}
-              >
-                Register
-              </button>
-            </div>
-            <div style={{ position: "relative" }}>
-              <input
-                type="text"
-                id="grade"
-                className="fadeIn second"
-                value="physical science"
-                name="login"
-              />
-              <button
-                style={{
-                  position: "absolute",
-                  top: "20px",
-                  right: "0",
-                  marginRight: "50px",
-                }}
-              >
-                Register
-              </button>
-            </div>
-            <div style={{ position: "relative" }}>
-              <input
-                type="text"
-                id="grade"
-                className="fadeIn third"
-                value="Accounting"
-                name="login"
-              />
-              <button
-                style={{
-                  position: "absolute",
-                  top: "20px",
+            <div>
+              <div style={{ position: "relative" }}>
+                {}
+                <input
+                  type="text"
+                  id="grade"
+                  className="fadeIn second"
+                  value="mathematics"
+                  name="login"
+                />
+                <button
+                  style={{
+                    position: "absolute",
+                    top: "20px",
+                    right: "0",
+                    marginRight: "50px",
+                  }}
+                >
+                  Register
+                </button>
+              </div>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  id="grade"
+                  className="fadeIn second"
+                  value="physical science"
+                  name="login"
+                />
+                <button
+                  style={{
+                    position: "absolute",
+                    top: "20px",
+                    right: "0",
+                    marginRight: "50px",
+                  }}
+                >
+                  Register
+                </button>
+              </div>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  id="grade"
+                  className="fadeIn third"
+                  value="Accounting"
+                  name="login"
+                />
+                <button
+                  style={{
+                    position: "absolute",
+                    top: "20px",
 
-                  right: "0",
-                  marginRight: "50px",
-                }}
-              >
-                Register
-              </button>
+                    right: "0",
+                    marginRight: "50px",
+                  }}
+                >
+                  Register
+                </button>
+              </div>
             </div>
+
             <input type="submit" class="fadeIn fourth" value="Submit" />
           </form>
         </div>

@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { useHistory, Redirect } from "react-router";
+import { useHistory } from "react-router-dom";
 import { auth } from "../firebase";
 import "../styles/dist/login.css";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -16,31 +16,29 @@ function Login() {
     const password = user.password;
     await auth
       .signInWithEmailAndPassword(email, password)
-      .then(history.push("/userprofile"))
+      .then(history.push("/dashboard"))
       .catch((error) => console.error(error));
+  };
+  const handleSignup = () => {
+    history.push("/signup");
   };
   return (
     <div>
       <div class="wrapper fadeInDown">
         <div id="formContent">
           <h2 class="active"> Sign In </h2>
-          <h2 class="inactive underlineHover">Sign Up </h2>
+          <h2 class="inactive underlineHover" onClick={handleSignup}>
+            Sign Up{" "}
+          </h2>
 
-          <div class="fadeIn first">
-            {/* <img
-              src="http://danielzawadzki.com/codepen/01/icon.svg"
-              id="icon"
-              alt="User Icon"
-            /> */}
-            <AccountCircleIcon />
-          </div>
-          <form>
+          <form onSubmit={handleLogin}>
             <input
               type="text"
               id="login"
               className="fadeIn second"
               name="login"
               placeholder="login"
+              onChange={(e) => setUser({ ...user, email: e.target.value })}
             />
             <input
               type="text"
@@ -48,6 +46,7 @@ function Login() {
               className="fadeIn third"
               name="login"
               placeholder="password"
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
             />
             <input type="submit" class="fadeIn fourth" value="Log In" />
           </form>

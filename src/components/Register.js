@@ -1,38 +1,40 @@
 import { React, useState, useEffect } from "react";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { useHistory } from "react-router-dom";
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import "../styles/dist/register.css";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-function Register() {
+function Signup() {
   const [user, setUser] = useState({
     email: "",
-    password: "",
-    confirmPassword: "",
+    first_Name: "",
+    last_Name: "",
+    school_Name: "",
+    grade: "",
   });
   const history = useHistory();
   const handleReg = async (e) => {
     e.preventDefault();
-    const email = user.email;
-    const password = user.password;
-    const confirmPassword = user.confirmPassword;
-    if (password === confirmPassword) {
-      await auth.createUserWithEmailAndPassword(email, password);
-      history.push("/profilereg");
-    } else {
-      alert("Passwords do not match");
-    }
+    const docRef = doc(db, "students", "EKO8ERaOvqRsXinUGWUP");
+    const payload = {
+      first_Name: user.first_Name,
+      last_Name: user.last_Name,
+      school_Name: user.school_Name,
+      grade: user.grade,
+    };
+    await updateDoc(docRef, {
+      students: arrayUnion(payload),
+    }).then(history.push("/dashboard"));
   };
+
   return (
     <div>
       <div class="wrapper fadeInDown">
         <div id="formContent">
-          <h2 className="inactive underlineHover"> Sign In </h2>
-          <h2 className="active">Sign Up </h2>
+          <h2 className="inactive underlineHover">
+            Hi User, Welcome to inspire academy
+          </h2>
 
-          <div class="fadeIn first">
-            <AccountCircleIcon />
-          </div>
-          <form>
+          <form onSubmit={handleReg}>
             <input
               type="text"
               id="login"
@@ -40,7 +42,8 @@ function Register() {
               name="login"
               placeholder="First name"
               required
-            />{" "}
+              onChange={(e) => setUser({ ...user, first_Name: e.target.value })}
+            />
             <input
               type="text"
               id="login"
@@ -48,6 +51,7 @@ function Register() {
               name="login"
               placeholder="Last name"
               required
+              onChange={(e) => setUser({ ...user, last_Name: e.target.value })}
             />
             <input
               type="text"
@@ -55,6 +59,18 @@ function Register() {
               className="fadeIn third"
               name="login"
               placeholder="Enter School Name"
+              onChange={(e) =>
+                setUser({ ...user, school_Name: e.target.value })
+              }
+            />
+            <input
+              type="email"
+              id="grade"
+              className="fadeIn second"
+              name="login"
+              placeholder="email"
+              required
+              onChange={(e) => setUser({ ...user, email: e.target.value })}
             />
             <input
               type="number"
@@ -63,6 +79,7 @@ function Register() {
               name="login"
               placeholder="grade"
               required
+              onChange={(e) => setUser({ ...user, grade: e.target.value })}
             />
             <input
               type="file"
@@ -71,21 +88,7 @@ function Register() {
               name="login"
               placeholder="Consent Form"
             />
-            <input
-              type="text"
-              id="password"
-              className="fadeIn third"
-              name="login"
-              placeholder="password"
-            />
-            <input
-              type="text"
-              id="password"
-              className="fadeIn third"
-              placeholder="repeat password"
-              required
-            />
-            <input type="submit" className="fadeIn fourth" value="Sign Up" />
+            <input type="submit" className="fadeIn fourth" value="SUBMIT" />
           </form>
         </div>
       </div>
@@ -93,4 +96,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default Signup;

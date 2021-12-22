@@ -1,25 +1,21 @@
 import "./App.css";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
-
-import Login from "./components/Login";
 import Register from "./components/Register";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 function App() {
   return (
     <div className="App">
       <Router>
         <Switch>
-          <Route exact path="login">
-            <Login />
-          </Route>
-          <Route exact path="signup">
-            <Register />
-          </Route>
-          <PrivateRoute path="dashboard" component={Dashboard} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/signup" component={Signup} />
+          <PrivateRoute path="/dashboard" component={Dashboard} />
+          <PrivateRoute path="/register" component={Register} />
         </Switch>
       </Router>
-      <Dashboard />
     </div>
   );
 }

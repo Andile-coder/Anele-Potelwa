@@ -11,25 +11,27 @@ import {
   doc,
   getDoc,
   getDocs,
+  updateDoc,
+  arrayUnion,
+  useHistory,
+  updateData,
+  setDoc,
+  arrayRemove,
 } from "firebase/firestore";
+
 function Dashboard() {
   const [courses, setCourses] = useState([]);
+  const [regCourses, setRegCourse] = useState([]);
+  const [grade, setGrade] = useState([]);
+  const [center, setCenter] = useState([]);
+  const [students, setStudents] = useState([]);
+  const docRef = doc(db, "centers", "Ywr3vZiwpJ6H27kiIa0o");
+  const stuRef = doc(db, "students", "EKO8ERaOvqRsXinUGWUP");
+
   const getComments = async () => {
-    const docRef = doc(db, "centers", "Ywr3vZiwpJ6H27kiIa0o");
-    const stuRef = doc(db, "students", "EKO8ERaOvqRsXinUGWUP");
-    onSnapshot(stuRef, (snapshot) => {
-      if (snapshot.data() !== undefined) {
-        snapshot.data().students.forEach((stu) => {
-          if (stu.stu_id == auth.currentUser.uid) {
-            console.log("stu", stu);
-          }
-        });
-      }
-    });
     onSnapshot(docRef, (snapshot) => {
       if (snapshot.data() !== undefined && courses.length == 0) {
         snapshot.data().centres.forEach((center, i) => {
-          //
           onSnapshot(stuRef, (snapshot2) => {
             if (snapshot2.data() !== undefined) {
               snapshot2.data().students.forEach((stu) => {
@@ -58,15 +60,84 @@ function Dashboard() {
       console.log("courses", courses);
     });
   };
+  const getCenters = () => {
+    const docRef = doc(db, "centers", "center1");
+    onSnapshot(stuRef, (snapshot) => {
+      if (snapshot.data() !== undefined) {
+        setStudents(snapshot.data().students.map((student) => student));
+      }
+    });
+    console.log("students", students);
+    onSnapshot(docRef, (snapshot) => {
+      if (snapshot.data() !== undefined) {
+        students.map((elem) => {
+          if (elem.stu_id === auth.currentUser.uid) {
+          }
+          return;
+        });
+        setCenter(snapshot.data().grade6.map((course) => course));
+      }
+    });
+  };
+  const centers = async (e) => {
+    const docRef = doc(db, "centers", "center1");
+    const payload = {
+      stud_id: auth.currentUser.uid,
+      name: "Andile",
+      surname: "Masela",
+    };
+    onSnapshot(docRef, (snapshot) => {
+      if (snapshot.data() !== undefined) {
+        setGrade(snapshot.data().grade6.map((course) => course));
+      }
+    });
+    let newstudents = grade;
+    newstudents.forEach((elem) => {
+      if (elem.course === "ics") {
+        elem.students.push(payload);
+      } else {
+      }
+    });
+    await updateDoc(docRef, {
+      grade6: newstudents,
+    });
+    getCenters();
+  };
+  const register = async (e) => {
+    e.preventDefault();
+    const docRef = doc(db, "student_course", auth.currentUser.uid);
+    const payload = { name: e.target.value };
+    await updateDoc(docRef, {
+      courses: arrayUnion(payload),
+    });
+    centers();
+  };
+  const Deregister = async (e) => {
+    e.preventDefault();
+    const docRef = doc(db, "student_course", auth.currentUser.uid);
+    const payload = { name: e.target.value };
+    await updateDoc(docRef, {
+      courses: arrayRemove(payload),
+    });
+  };
+  const getCourses = () => {
+    const docRef = doc(db, "student_course", auth.currentUser.uid);
+    onSnapshot(docRef, (snapshot) => {
+      if (snapshot.data() !== undefined) {
+        setRegCourse(snapshot.data().courses.map((course) => course.name));
+      }
+    });
+  };
   useEffect(() => {
     getComments();
-  });
+    getCourses();
+    console.log("reCourse", regCourses);
+  }, []);
   return (
     <div>
       <div class="wrapper fadeInDown">
         <div id="formContent">
           <h2 className="">Available courses </h2>
-          <div class="fadeIn first"></div>
 
           <form>
             {courses.map((elem) => (
@@ -82,12 +153,14 @@ function Dashboard() {
                     name="login"
                   />
                   <button
+                    onClick={register}
                     style={{
                       position: "absolute",
                       top: "20px",
                       right: "0",
                       marginRight: "50px",
                     }}
+                    value="mathematics"
                   >
                     Register
                   </button>
@@ -101,6 +174,8 @@ function Dashboard() {
                     name="login"
                   />
                   <button
+                    onClick={register}
+                    value="Physical Science"
                     style={{
                       position: "absolute",
                       top: "20px",
@@ -120,6 +195,8 @@ function Dashboard() {
                     name="login"
                   />
                   <button
+                    onClick={register}
+                    value="Accounting"
                     style={{
                       position: "absolute",
                       top: "20px",
@@ -134,7 +211,7 @@ function Dashboard() {
               </div>
             ))}
 
-            <input type="submit" class="fadeIn fourth" value="Submit" />
+            {/* <input type="submit" className="fadeIn fourth" value="Submit" /> */}
           </form>
         </div>
       </div>
@@ -144,31 +221,32 @@ function Dashboard() {
 
           <div class="fadeIn first"></div>
           <form>
-            <input
-              type="checkbox"
-              id="grade"
-              className="fadeIn second"
-              name="login"
-              placeholder="First name"
-              required
-            />
-            <label>Mathematics</label>
-            <input
-              type="checkbox"
-              id="grade"
-              className="fadeIn second"
-              name="login"
-            />
-            <label>Physical science</label>
-            <input
-              type="checkbox"
-              id="grade"
-              className="fadeIn third"
-              name="login"
-            />
-            <label>Accounting</label>
-
-            {/* <input type="submit" className="fadeIn fourth" value="Sign Up" /> */}
+            {regCourses.map((course) => (
+              <div>
+                <div style={{ position: "relative" }}>
+                  {}
+                  <input
+                    type="text"
+                    id="grade"
+                    className="fadeIn second"
+                    value={course}
+                    name="login"
+                  />
+                  <button
+                    onClick={Deregister}
+                    style={{
+                      position: "absolute",
+                      top: "20px",
+                      right: "0",
+                      marginRight: "50px",
+                    }}
+                    value={course}
+                  >
+                    Deregister
+                  </button>
+                </div>
+              </div>
+            ))}
           </form>
         </div>
       </div>

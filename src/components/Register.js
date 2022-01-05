@@ -1,7 +1,14 @@
 import { React, useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { useHistory } from "react-router-dom";
-import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  Update,
+  setDoc,
+} from "firebase/firestore";
 import "../styles/dist/register.css";
 function Signup() {
   const [user, setUser] = useState({
@@ -16,6 +23,7 @@ function Signup() {
   const handleReg = async (e) => {
     e.preventDefault();
     const docRef = doc(db, "students", "EKO8ERaOvqRsXinUGWUP");
+
     const payload = {
       stu_id: auth.currentUser.uid,
       first_Name: user.first_Name,
@@ -26,7 +34,13 @@ function Signup() {
     };
     await updateDoc(docRef, {
       students: arrayUnion(payload),
-    }).then(history.push("/dashboard"));
+    })
+      .then(async () => {
+        await setDoc(doc(db, "student_course", auth.currentUser.uid), {
+          courses: [],
+        });
+      })
+      .then(history.push("/dashboard"));
   };
 
   return (
